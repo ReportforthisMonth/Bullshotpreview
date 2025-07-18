@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spline Viewer Scene</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    spline-viewer {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .x-button {
+      position: absolute;
+      bottom: 10px; /* directly on top of Spline badge */
+      right: 10px;
+      background-color: orange;
+      border: none;
+      padding: 12px 80px; /* wider to cover badge */
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      z-index: 9999;
+    }
+    .x-button:hover {
+      background-color: red;
+    }
+    .x-button svg {
+      height: 24px;
+      width: 24px;
+      fill: white;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+  <!-- Spline Viewer JS Module -->
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.10.32/build/spline-viewer.js"></script>
+</head>
+<body>
+
+  <!-- Wider X logo button directly on top of the "Built with Spline" badge -->
+  <a href="https://x.com/Bullshot911" target="_blank" class="x-button">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20.835 3H17.29l-3.335 4.252L9.39 3H3.582l6.875 9.23L3.165 21h3.545l3.51-4.49 4.838 4.49h5.803l-7.055-9.463L20.835 3z"/>
+    </svg>
+  </a>
+
+  <!-- Embed your Spline scene -->
+  <spline-viewer url="https://prod.spline.design/G2gu7ouo62ot6UlX/scene.splinecode"></spline-viewer>
+
+</body>
+</html>
