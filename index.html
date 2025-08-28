@@ -3,60 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Spline Hero (Fixed Zoom, Full Width)</title>
+  <title>Spline Hero (Responsive Fullscreen)</title>
   <!-- Spline Viewer JS Module -->
   <script type="module" src="https://unpkg.com/@splinetool/viewer@1.10.52/build/spline-viewer.js"></script>
   <style>
-    :root{
-      --design-w: 1440;
-      --design-h: 810;
-    }
-
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
       overflow-x: hidden;
+      background: transparent;
     }
 
-    /* --- HERO SECTION --- */
+    /* HERO SECTION FULLY RESPONSIVE */
     .hero {
       height: 100dvh;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      background: transparent; /* let spline scene background show */
+      width: 100vw;
       position: relative;
       top: 0;
       left: 0;
-    }
-
-    .stage {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       overflow: hidden;
-      position: relative;
     }
 
-    .design {
+    .hero spline-viewer {
       width: 100%;
       height: 100%;
       display: block;
+      border: none;
+      object-fit: contain; /* keep scene from appearing too zoomed */
     }
 
-    .design spline-viewer {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    /* --- BELOW CONTENT --- */
+    /* BELOW CONTENT */
     .below {
       min-height: 100vh;
       background: #fff;
@@ -66,52 +44,27 @@
       padding: clamp(16px, 4vw, 48px);
     }
 
-    .below h2{ font-size: clamp(22px, 3vw, 40px); margin: 0; }
-    .below p{ max-width: 70ch; line-height: 1.6; margin: 0; }
-
-    @media (max-height: 520px){
-      .hero{ height: 520px; }
-    }
+    .below h2 { font-size: clamp(22px, 3vw, 40px); margin: 0; }
+    .below p { max-width: 70ch; line-height: 1.6; margin: 0; }
   </style>
 </head>
 <body>
 
-  <!-- HERO with fixed visual scale -->
-  <section class="hero" id="hero">
-    <div class="stage" id="stage">
-      <div class="design" id="design">
-        <spline-viewer url="https://prod.spline.design/LpU4YbAeiD3BevwJ/scene.splinecode"></spline-viewer>
-      </div>
-    </div>
+  <!-- HERO with responsive scene -->
+  <section class="hero">
+    <spline-viewer
+      url="https://prod.spline.design/LpU4YbAeiD3BevwJ/scene.splinecode"
+      loading="lazy"
+    ></spline-viewer>
   </section>
 
   <!-- BELOW SECTION -->
   <section class="below">
     <h2>Below the Hero</h2>
     <p>
-      This is the white section below the hero. The spline scene above always stays fixed to the top and fills the full width without white borders.
+      This is the white section below the hero. The spline scene above is now fully responsive — always fills the screen top-to-bottom and side-to-side, with reduced zoom by using <code>object-fit: contain</code>.
     </p>
   </section>
 
-  <script>
-    (function(){
-      const DESIGN_W = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--design-w')) || 1440;
-      const DESIGN_H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--design-h')) || 810;
-      const hero   = document.getElementById('hero');
-      const design = document.getElementById('design');
-
-      function fit(){
-        const rect = hero.getBoundingClientRect();
-        const scale = Math.min(rect.width / DESIGN_W, rect.height / DESIGN_H);
-        design.style.transform = `scale(${scale})`;
-      }
-
-      addEventListener('resize', fit, { passive: true });
-      addEventListener('orientationchange', fit, { passive: true });
-      document.fonts?.ready?.then(fit).catch(fit);
-      new ResizeObserver(fit).observe(hero);
-      fit();
-    })();
-  </script>
 </body>
 </html>
