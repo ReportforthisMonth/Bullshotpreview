@@ -3,74 +3,67 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Spline Hero (Full‑Bleed + Fixed Zoom)</title>
+  <title>Spline Hero (Fixed Zoom, Full Width)</title>
   <!-- Spline Viewer JS Module -->
   <script type="module" src="https://unpkg.com/@splinetool/viewer@1.10.52/build/spline-viewer.js"></script>
   <style>
     :root{
-      /* Keep the visual "zoom" by scaling FROM this base size */
-      --design-w: 1440; /* px */
-      --design-h: 810;  /* px */
+      --design-w: 1440;
+      --design-h: 810;
     }
-
-    *{ box-sizing: border-box }
 
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      background: transparent;      /* let Spline scene background show */
-      overflow-x: hidden;           /* no side gaps */
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
+      width: 100%;
+      overflow-x: hidden;
     }
 
-    /* --- HERO: full-bleed, pinned to top, no side lines --- */
+    /* --- HERO SECTION --- */
     .hero {
-      width: 100vw;                 /* stick to sides */
-      height: 100dvh;               /* full dynamic viewport height */
-      display: grid;
-      place-items: center;
-      overflow: hidden;             /* hide any letterbox area */
-      background: transparent;      /* don't overlay white — show scene bg */
-      position: relative;           /* at top by default */
-      isolation: isolate;
+      height: 100dvh;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      background: transparent; /* let spline scene background show */
+      position: relative;
+      top: 0;
+      left: 0;
     }
 
     .stage {
-      width: 100vw;
-      height: 100dvh;
-      display: grid;
-      place-items: center;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       overflow: hidden;
       position: relative;
-      background: transparent;
     }
 
-    /* Fixed-size canvas we scale (keeps identical framing across screens) */
     .design {
-      width: calc(var(--design-w) * 1px);
-      height: calc(var(--design-h) * 1px);
-      transform-origin: center center;
-      will-change: transform;
-      display: grid;
-      backface-visibility: hidden; /* prevent hairline gaps */
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .design spline-viewer {
       width: 100%;
       height: 100%;
       display: block;
-      background: transparent;      /* rely on scene's own background */
     }
 
-    /* White content section below (optional) */
+    /* --- BELOW CONTENT --- */
     .below {
       min-height: 100vh;
       background: #fff;
-      padding: clamp(16px, 4vw, 48px);
       display: grid;
       align-content: start;
       gap: 2rem;
+      padding: clamp(16px, 4vw, 48px);
     }
 
     .below h2{ font-size: clamp(22px, 3vw, 40px); margin: 0; }
@@ -78,30 +71,29 @@
 
     @media (max-height: 520px){
       .hero{ height: 520px; }
-      .stage{ height: 520px; }
     }
   </style>
 </head>
 <body>
-  <!-- HERO (full-bleed, fixed zoom, scene bg visible) -->
+
+  <!-- HERO with fixed visual scale -->
   <section class="hero" id="hero">
     <div class="stage" id="stage">
       <div class="design" id="design">
-        <spline-viewer
-          url="https://prod.spline.design/LpU4YbAeiD3BevwJ/scene.splinecode"
-        ></spline-viewer>
+        <spline-viewer url="https://prod.spline.design/LpU4YbAeiD3BevwJ/scene.splinecode"></spline-viewer>
       </div>
     </div>
   </section>
 
-  <!-- WHITE SECTION UNDER HERO -->
+  <!-- BELOW SECTION -->
   <section class="below">
     <h2>Below the Hero</h2>
-    <p>Add your normal page content here. The hero above stays full‑bleed and keeps the same visual zoom across devices.</p>
+    <p>
+      This is the white section below the hero. The spline scene above always stays fixed to the top and fills the full width without white borders.
+    </p>
   </section>
 
   <script>
-    // Fixed-zoom scaler: scales the fixed canvas to fit hero without changing framing
     (function(){
       const DESIGN_W = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--design-w')) || 1440;
       const DESIGN_H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--design-h')) || 810;
@@ -111,7 +103,7 @@
       function fit(){
         const rect = hero.getBoundingClientRect();
         const scale = Math.min(rect.width / DESIGN_W, rect.height / DESIGN_H);
-        design.style.transform = `scale(${scale}) translateZ(0)`; // translateZ avoids hairlines on some GPUs
+        design.style.transform = `scale(${scale})`;
       }
 
       addEventListener('resize', fit, { passive: true });
