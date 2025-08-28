@@ -1,31 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Spline Viewer Scene</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spline Hero (Fixed Zoom)</title>
+  <!-- Spline Viewer JS Module -->
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.10.52/build/spline-viewer.js"></script>
   <style>
+    :root{
+      /* Your design canvas size — keep the same "zoom" by always scaling FROM this size */
+      --design-w: 1440; /* px */
+      --design-h: 810;  /* px (16:9 feel) */
+      --page-bg: #ffffff; /* white area under hero */
+    }
+
     html, body {
       margin: 0;
       padding: 0;
-      height: 100%;
-      overflow: hidden;
+      background: var(--page-bg);
+      color: #111;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
     }
-    spline-viewer {
+
+    /* --- HERO SECTION (fixed visual zoom) --- */
+    .hero {
+      height: 100svh;               /* full viewport height incl. mobile UI */
+      display: grid;                /* center the stage */
+      place-items: center;
+      overflow: hidden;             /* hide letterbox overflow */
+      background: #fff;             /* background around the scaled canvas */
+      position: relative;
+      isolation: isolate;
+    }
+
+    /* A centered stage that will hold the fixed-size design canvas */
+    .stage {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      overflow: hidden;             /* hide any extra */
+      position: relative;
+    }
+
+    /* The fixed design canvas (we scale this instead of letting it reflow) */
+    .design {
+      width: calc(var(--design-w) * 1px);
+      height: calc(var(--design-h) * 1px);
+      transform-origin: center center;
+      will-change: transform;
+      display: grid;
+    }
+
+    /* Make the Spline viewer fill our fixed-size design area */
+    .design spline-viewer {
       width: 100%;
       height: 100%;
       display: block;
     }
 
+    /* Optional: a soft gradient behind the scene for nicer letterboxing */
+    .hero::before{
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(80% 60% at 50% 40%, rgba(0,0,0,0.04), rgba(0,0,0,0));
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* --- BELOW CONTENT (white section under the hero) --- */
+    .below {
+      min-height: 100vh;            /* space to scroll into */
+      background: #fff;
+      display: grid;
+      align-content: start;
+      gap: 2rem;
+      padding: clamp(16px, 4vw, 48px);
+    }
+
+    .below h2{ font-size: clamp(22px, 3vw, 40px); margin: 0; }
+    .below p{ max-width: 70ch; line-height: 1.6; margin: 0; }
+
+    /* Small helper for very short screens */
+    @media (max-height: 520px){
+      .hero{ height: 520px; }
+    }
   </style>
-  <!-- Spline Viewer JS Module -->
-  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.10.32/build/spline-viewer.js"></script>
 </head>
 <body>
 
-  <!-- Embed your Spline scene -->
-  <spline-viewer url="https://prod.spline.design/LpU4YbAeiD3BevwJ/scene.splinecode"></spline-viewer>
+  <!-- HERO with fixed visual scale -->
+  <section class="hero" id="hero">
+    <div class="stage" id="stage">
+      <div class="design" id="design">
+        <!-- Your Spline scene (keeps same "zoom" because the .design is fixed-size and only scaled) -->
+        <spline-viewer url="https://prod.spline.design/LpU4YbAeiD3BevwJ/scene.splinecode"></spline-viewer>
+      </div>
+    </div>
+  </section>
 
+  <!-- WHITE SECTION UNDER HERO -->
+  <section class="below">
+    <h2>Below the Hero</h2>
+    <p>
+      This is a normal white page section under the hero. The hero keeps the same visual zoom on all screens by
+      scaling a fixed-size design canvas instead of letting it reflow. You can add your content here.
+    </p>
+  </section>
+
+  <script>
+    // Fixed-zoom scaler: scales a fixed design canvas to fit within the hero (letterboxes if aspect differs)
+    (function(){
+      const DESIGN_W = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--design-w')) || 1440;
+      const DESIGN_H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--design-h')) || 810;
+      const hero   = document.getElementById('hero');
+      const design = document.getElementById('design');
+
+      function fit(){
+        const rect = hero.getBoundingClientRect();
+        const scale = Math.min(rect.width / DESIGN_W, rect.height / DESIGN_H);
+        design.style.transform = `scale(${scale})`;
+      }
+
+      // Run on load, resize, and orientation changes
+      addEventListener('resize', fit, { passive: true });
+      addEventListener('orientationchange', fit, { passive: true });
+      document.fonts?.ready?.then(fit).catch(fit);
+      // Use ResizeObserver for layout changes (e.g., mobile UI bars)
+      new ResizeObserver(fit).observe(hero);
+
+      // Initial
+      fit();
+    })();
+  </script>
 </body>
 </html>
-
-
